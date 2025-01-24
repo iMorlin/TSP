@@ -7,8 +7,9 @@ constexpr const double ALPHA = 1.0; // Влияние феромонов
 constexpr const double BETA = 2.0;  // Влияние расстояния
 constexpr const double EVAPORATION_RATE = 0.5;
 constexpr const double Q = 100.0; // Количество феромона, добавляемого на путь
-constexpr const int NUM_ANTS = 10;
+constexpr const int NUM_ANTS = 1000;
 constexpr const int NUM_ITERATIONS = 100;
+constexpr const int PATH_LEGTH = 10000;
 
 
 /**
@@ -23,15 +24,16 @@ CAntColony::CAntColony(QVector<QPointF> points) : points(points)
 /**
  * @brief Запуск Алгоритма
  */
-void CAntColony::run()
+void CAntColony::run(int userIndex)
 {
     for(int iteration = 0; iteration < NUM_ITERATIONS; ++iteration)
     {
         QVector<QVector<int>> antPaths(NUM_ANTS);
         QVector<double> pathCosts(NUM_ANTS, 0.0);
 
-        for (int ant = 0; ant < NUM_ANTS; ++ant) {
-            antPaths[ant] = findPath();
+        for (int ant = 0; ant < NUM_ANTS; ++ant)
+        {
+            antPaths[ant] = findPath(userIndex);
             pathCosts[ant] = calculateCost(antPaths[ant]);
         }
 
@@ -53,7 +55,7 @@ void CAntColony::initializePheromones()
  * @brief Пойск пути
  * @return путь
  */
-QVector<int> CAntColony::findPath()
+QVector<int> CAntColony::findPath(int finalPoit)
 {
     QVector<int> path;
     QVector<bool> visited(NUM_POINTS, false);
@@ -66,6 +68,9 @@ QVector<int> CAntColony::findPath()
         currentPoint = selectNextPoint(currentPoint, visited);
         path.append(currentPoint);
         visited[currentPoint] = true;
+
+        if(finalPoit == currentPoint)
+            break;
     }
 
     return path;
@@ -126,10 +131,7 @@ double CAntColony::calculateCost(const QVector<int> &path)
     {
         cost += distance(points[path[i]], points[path[i + 1]]);
     }
-
-    // Замкнем путь
-    cost += distance(points[path.back()], points[path.front()]);
-    return cost * 10; // Умножаем на стоимость
+    return cost; // Умножаем на стоимость
 }
 
 /**
@@ -169,15 +171,15 @@ QVector<int> CAntColony::findBestPath(const QVector<QVector<int> > &antPaths, co
 {
     double minCost = std::numeric_limits<double>::max();
     QVector<int> bestPath;
-
     for(int i = 0; i < NUM_ANTS; ++i)
     {
-        if(pathCosts[i] < minCost)
+        if(std::abs(pathCosts[i] - PATH_LEGTH) < minCost)
         {
-            minCost = pathCosts[i];
+            minCost = std::abs(pathCosts[i] - PATH_LEGTH);
             bestPath = antPaths[i];
         }
     }
+
 
     return bestPath;
 }

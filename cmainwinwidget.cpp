@@ -91,13 +91,8 @@ void CMainWinWidget::mousePressEvent(QMouseEvent *event)
         {
             // Проверяем, попали ли в точку
             userIndex = i;
-
-            auto element = points[userIndex];
-            points.erase(points.begin() + userIndex);
-            points.insert(0, element);
-
             CAntColony colony(points);
-            colony.run();
+            colony.run(userIndex);
             path = colony.GetBestPath();
             update(); // Обновляем виджет для отображения пути
             return;

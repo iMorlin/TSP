@@ -7,7 +7,7 @@ class CAntColony
 {
 public:
     CAntColony(QVector<QPointF> points);
-    void run();
+    void run(int userIndex);
 
     const QVector<int> GetBestPath()
         { return bestPath; }
@@ -15,7 +15,7 @@ public:
 private:
     void initializePheromones();
 
-    QVector<int> findPath();
+    QVector<int> findPath(int userIndex);
     int selectNextPoint(int current, const QVector<bool> &visited);
     double calculateCost(const QVector<int> &path);
     void updatePheromones(const QVector<QVector<int>> &antPaths, const QVector<double> &pathCosts);
